@@ -22,12 +22,24 @@ def pad_to_multiple(tensor, base=16):
 
 
 def restore_image(model, inp, tta=False):
-    """Run model, optionally with horizontal flip TTA."""
-    out = model(inp)
-    if tta:
-        out_flip = model(torch.flip(inp, dims=[-1]))
-        out = (out + torch.flip(out_flip, dims=[-1])) / 2
-    return out
+    """Run model with optional 8-fold TTA (4 rotations x 2 flips)."""
+    if not tta:
+        return model(inp)
+
+    outputs = []
+    for k in range(4):
+        for flip in [False, True]:
+            x = inp
+            if flip:
+                x = torch.flip(x, dims=[-1])
+            x = torch.rot90(x, k, dims=[-2, -1])
+            out = model(x)
+            out = torch.rot90(out, -k, dims=[-2, -1])
+            if flip:
+                out = torch.flip(out, dims=[-1])
+            outputs.append(out)
+
+    return torch.stack(outputs).mean(dim=0)
 
 
 def main():
@@ -39,7 +51,7 @@ def main():
     parser.add_argument('--output', type=str, default='pred.npz',
                         help='Output file name (must be pred.npz inside zip)')
     parser.add_argument('--tta', action='store_true',
-                        help='Enable horizontal flip test-time augmentation')
+                        help='Enable 8-fold TTA (4 rotations x 2 flips)')
     args = parser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
