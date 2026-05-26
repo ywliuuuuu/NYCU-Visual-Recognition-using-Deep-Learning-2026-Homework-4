@@ -1,3 +1,13 @@
+# Project-specific exclusions
+train_ckpt_hw4/
+logs_hw4/
+pred.npz
+submission.zip
+*.npz
+data/
+data_dir/
+ckpt/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
