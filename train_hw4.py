@@ -36,7 +36,8 @@ class PromptIRModel(pl.LightningModule):
         ([_, de_id], degrad, clean) = batch
         restored = self.net(degrad)
         loss = self.loss_fn(restored, clean)
-        self.log('train_loss', loss, prog_bar=True, on_step=True, on_epoch=True)
+        self.log('train_loss', loss,
+                 prog_bar=True, on_step=True, on_epoch=True)
         return loss
 
     def validation_step(self, batch, batch_idx):
@@ -69,8 +70,9 @@ class PromptIRModel(pl.LightningModule):
 def main():
     torch.set_float32_matmul_precision('medium')
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_dir', type=str, required=True,
-                        help='Path to train/ directory (contains degraded/ and clean/)')
+    parser.add_argument(
+        '--data_dir', type=str, required=True,
+        help='Path to train/ directory (contains degraded/ and clean/)')
     parser.add_argument('--ckpt_dir', type=str, default='train_ckpt_hw4')
     parser.add_argument('--epochs', type=int, default=150)
     parser.add_argument('--batch_size', type=int, default=8)

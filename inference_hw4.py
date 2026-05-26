@@ -75,7 +75,8 @@ def main():
 
             images_dict[img_path.name] = out_np
 
-    assert len(images_dict) == 100, f'Expected 100 images, got {len(images_dict)}'
+    assert len(images_dict) == 100, \
+        f'Expected 100 images, got {len(images_dict)}'
     for k, v in images_dict.items():
         assert v.shape[0] == 3, f'{k}: expected shape (3, H, W), got {v.shape}'
         assert v.dtype == np.uint8, f'{k}: expected uint8, got {v.dtype}'

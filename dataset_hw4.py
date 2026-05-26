@@ -49,13 +49,16 @@ class RainSnowDataset(Dataset):
         ps = self.patch_size
         top = random.randint(0, H - ps)
         left = random.randint(0, W - ps)
-        return img1[top:top + ps, left:left + ps], img2[top:top + ps, left:left + ps]
+        return (img1[top:top + ps, left:left + ps],
+                img2[top:top + ps, left:left + ps])
 
     def __getitem__(self, idx):
         deg_path, cln_path, de_type = self.pairs[idx]
 
-        deg_img = crop_img(np.array(Image.open(deg_path).convert('RGB')), base=16)
-        cln_img = crop_img(np.array(Image.open(cln_path).convert('RGB')), base=16)
+        deg_img = crop_img(
+            np.array(Image.open(deg_path).convert('RGB')), base=16)
+        cln_img = crop_img(
+            np.array(Image.open(cln_path).convert('RGB')), base=16)
 
         if self.is_train:
             deg_patch, cln_patch = self._random_crop(deg_img, cln_img)
@@ -64,7 +67,9 @@ class RainSnowDataset(Dataset):
             deg_patch, cln_patch = deg_img, cln_img
 
         name = Path(deg_path).stem
-        return [name, de_type], self.to_tensor(deg_patch), self.to_tensor(cln_patch)
+        return ([name, de_type],
+                self.to_tensor(deg_patch),
+                self.to_tensor(cln_patch))
 
     def __len__(self):
         return len(self.pairs)
